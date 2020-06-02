@@ -63,7 +63,7 @@ headers:
   bold: true
 ```
 
-### keywords:  define foreground and background colors for cells containing a keyword
+### keywords: define foreground and background colors for cells matching a keyword
 ```yaml
 keywords:
   'Yes':
