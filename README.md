@@ -36,7 +36,7 @@ xlscolors.py colors spreadsheets according to a stylesheet written in YAML :
 
 The stylesheet is plain and simple YAML, with the use of anchors and aliases to allow easy reuse of color names.
 
-```YAML
+```yaml
   white: &white 'ffffff'
   black: &black '000000'
   red: &red 'ff0000' 
@@ -45,7 +45,7 @@ The stylesheet is plain and simple YAML, with the use of anchors and aliases to 
 The stylesheet is divided in 3 sections:
 
 ### colors: Define base colors with their aliases.
-```YAML
+```yaml
 colors:
   #
   # Normal colors
@@ -56,7 +56,7 @@ colors:
 
 
 ### headers: define style for the header row (first row of each spreadsheet)
-```YAML
+```yaml
 headers:
   fg: *black
   bg: *yellow
@@ -64,7 +64,7 @@ headers:
 ```
 
 ### keywords:  define foreground and background colors for cells containing a keyword
-```YAML
+```yaml
 keywords:
   'Yes':
     fg: *black
