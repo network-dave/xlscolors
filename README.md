@@ -1,4 +1,4 @@
-# xlscolors.py
+# XLScolors
 
 Colorize Excel spreadsheets according to keywords defined in a stylesheet, using the OpenPyxl library.
 
@@ -9,14 +9,17 @@ Attention: running the script without specifying an output file will **OVERWRITE
 
 ```shell
 pip3 install -r requirements.txt
-python xlscolors.py my_excel_file.xlsx
+python xlscolors.py my_excel_file.xlsx [--outfile colorized.xlsx]
 ```
 
+Works with .xls and .xlsx files.
 
 For available options, see :
 ```shell
 python xlscolors.py --help
 ```
+
+
 
 
 ## Stylesheet

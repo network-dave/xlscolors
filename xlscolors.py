@@ -99,11 +99,12 @@ def main():
     '''
     # Parse command line arguments
     argparser = argparse.ArgumentParser(
-        description="Colorize Excel workbooks"
+        description="Colorize Excel workbooks according to a stylesheet"
         )
     argparser.add_argument(
         "infile",
         metavar="filename.xlsx"
+        help="Excel file to colorize"
         )
     argparser.add_argument(
         "--outfile",
