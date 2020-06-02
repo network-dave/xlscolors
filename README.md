@@ -13,6 +13,12 @@ python xlscolors.py my_excel_file.xlsx
 ```
 
 
+For available options, see :
+```shell
+python xlscolors.py --help
+```
+
+
 ## Stylesheet
 xlscolors.py colors spreadsheets according to a stylesheet written in YAML :
 
