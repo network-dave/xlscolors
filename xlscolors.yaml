@@ -1,0 +1,80 @@
+# Default xlscolors.py stylesheet
+
+#
+# Define aliases for colors
+# The RGB values are taken from Excel 2016 standard colors
+#
+colors:
+  #
+  # Normal colors
+  #
+  white: &white 'ffffff'
+  black: &black '000000'
+  red: &red 'ff0000' 
+  green: &green '92D050' 
+  yellow: &yellow 'ffff00' 
+  magenta: &magenta 'ff00ff' 
+  blue: &blue '00B0F0'
+  orange: &orange 'FFC000'
+  purple: &purple '7030A0'
+  pink: &pink 'ff6699'
+  brown: &brown 'b36b00'
+  #
+  # Lighter colors
+  #
+  light_gray: &light_gray 'D9D9D9'
+  light_red: &light_red 'E6B8B7'
+  light_green: &light_green 'D8E4BC'
+  light_yellow: &light_yellow 'ffffb3'
+  light_magenta: &light_magenta 'ffb3ff'
+  light_blue: &light_blue 'C5D9F1'
+  light_orange: &light_orange 'FCD5B4'
+  light_purple: &light_purple 'CCC0DA'
+  light_pink: &light_pink 'ffccdd'
+  #
+  # Darker colors
+  #
+  dark_gray: &dark_gray '595959'
+  dark_red: &dark_red 'C00000'
+  dark_green: &dark_green '00B050'
+  dark_yellow: &dark_yellow '999900'
+  dark_magenta: &dark_magenta '990099'
+  dark_blue: &dark_blue '0070C0'
+  dark_orange: &dark_orange 'cc2900'
+  dark_purple: &dark_purple '403151'
+  dark_pink: &dark_pink 'cc0066'
+
+#
+# Leave this section empty to leave the column headers untouched
+#
+headers:
+  fg: *black
+  bg: *yellow
+  bold: true
+
+#
+# Enter keywords and related color properties here. Each keyword *MUST* have 'fg' and 'bg' properties
+# Surround the keyword with '++' to match loosely, else match exactly. The matching is NOT case sensitive !
+# Some keywords like yes/no and true/false are reserved in YAML, so surround them in 'quotes' to use them as keywords
+#
+keywords:
+  'Yes':
+    fg: *black
+    bg: *green
+  'No':
+    fg: *black
+    bg: *red
+  '++true++':
+    fg: *white
+    bg: *dark_green
+  '++false++':
+    fg: *white
+    bg: *dark_red
+  colored cell:
+    fg: *light_gray
+    bg: *dark_blue
+  colorthisrow:
+    fg: *black
+    bg: *pink
+    whole_row: true
+  
