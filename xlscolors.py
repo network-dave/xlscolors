@@ -148,7 +148,8 @@ def main():
         description="Colorize Excel workbooks according to a stylesheet"
         )
     argparser.add_argument(
-        "infile",
+        "--infile",
+        required=True,
         metavar="filename.xlsx",
         help="Excel file to colorize"
         )

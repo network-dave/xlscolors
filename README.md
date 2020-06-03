@@ -2,23 +2,24 @@
 
 Colorize Excel spreadsheets according to keywords defined in a stylesheet, using the OpenPyxl library.
 
-Attention: running the script without specifying an output file will **OVERWRITE** the current spreadsheet/workbook ! 
-
 
 ## Installing/Getting started
 
 ```shell
 pip3 install -r requirements.txt
-python xlscolors.py my_excel_file.xlsx [--outfile colorized.xlsx]
+python xlscolors.py --infile my_excel_file.xlsx [--outfile colorized.xlsx]
 ```
 
 Works with .xls and .xlsx files.
 
+
+## Usage:
 For available options, see :
 ```shell
 python xlscolors.py --help
 ```
 
+**ATTENTION:** if no ```--outfile``` is specified, the Excel workbook will be modified in place! Please backup your important files first.
 
 
 
@@ -32,7 +33,7 @@ xlscolors.py colors spreadsheets according to a stylesheet written in YAML :
 
 
 
-## Syntax
+## Stylesheet Syntax
 
 The stylesheet is plain and simple YAML, with the use of anchors and aliases to allow easy reuse of color names.
 
