@@ -35,14 +35,34 @@ from openpyxl.styles import Font, PatternFill
 DEFAULT_STYLESHEET = "xlscolors.yaml"
 
 
-def colorize_worksheet(ws, keywords, headers={}):
+def load_stylesheet(filename=DEFAULT_STYLESHEET):
+    '''
+    Load stylesheet from YAML file and return headers and keywords dicts
+    '''
+    if not os.path.exists(filename):
+        filename = DEFAULT_STYLESHEET
+
+    # Open YAML configuration file and transform it into a dictionnary
+    logging.debug(f"[+] Loading stylesheet from {filename}")
+    try:
+        with open(filename) as f:
+            config_data = yaml.load(f.read(), Loader=yaml.SafeLoader)
+    except Exception as e:
+        logging.critical(f"[!] Could not load stylesheet {filename} (check YAML syntax)")
+        sys.exit(1)
+
+    # Extract the colors definition and keyword-to-color mappings from the config
+    headers = config_data["headers"]
+    keywords = config_data["keywords"]
+
+    return headers, keywords
+
+def colorize_worksheet(ws, headers, keywords):
     '''
     Colorize an Excel worksheet 
     '''
-    try:
-        logging.debug(f"[+] Colorizing worksheet {ws}")
-    except:
-        pass
+    
+    logging.debug(f"[+] Colorizing worksheet {ws}")
     rownum = 0
     for row in ws.iter_rows():
         rownum += 1
@@ -85,12 +105,38 @@ def colorize_worksheet(ws, keywords, headers={}):
                                 fill_type = "solid"
                                 )
 
-def colorize_workbook(wb, keywords, headers={}):
+def colorize_workbook(filename, stylesheet="", outfile=""):
     '''
     Colorize a whole Excel workbook
     '''
+    # Open workbook
+    try:
+        wb = load_workbook(filename)
+    except:
+        logging.critical(f"[!] Could not open {filename}")
+
+    # Check if we a YAML stylesheet with the same name than the Excel file exists, else load the default stylesheet
+    if not stylesheet:
+        stylesheet = filename.split(".xls")[0] + ".yaml"
+
+    if not os.path.exists(stylesheet):
+        stylesheet = DEFAULT_STYLESHEET
+
+    # Load stylesheet from YAML file
+    logging.debug(f"[+] Loading stylesheet {stylesheet}")
+    headers, keywords = load_stylesheet(stylesheet)
+
     for ws in wb.worksheets:
-        colorize_worksheet(ws, keywords, headers)
+        colorize_worksheet(ws, headers, keywords)
+
+    if not outfile:
+        outfile = filename
+
+    try:
+        wb.save(outfile)
+        logging.debug(f"[+] Done writing to {outfile}")
+    except:
+        logging.critical(f"[!] Could not write to {outfile}")
 
 
 def main():
@@ -103,7 +149,7 @@ def main():
         )
     argparser.add_argument(
         "infile",
-        metavar="filename.xlsx"
+        metavar="filename.xlsx",
         help="Excel file to colorize"
         )
     argparser.add_argument(
@@ -129,47 +175,14 @@ def main():
     else:
         logging.basicConfig(format="%(message)s", level=logging.INFO)
 
-    # Check if we a YAML stylesheet with the same name than the Excel file exists, else load the default stylesheet
-    if not args.stylesheet:
-        filename = args.infile.split(".xls")[0] + ".yaml"
-        if os.path.exists(filename):
-            args.stylesheet = filename
-        else:
-            args.stylesheet = DEFAULT_STYLESHEET
-
-    # Open YAML configuration file and transform it into a dictionnary
-    logging.debug(f"[+] Loading stylesheet from {args.stylesheet}")
-    try:
-        with open(args.stylesheet) as f:
-            config_data = yaml.load(f.read(), Loader=yaml.SafeLoader)
-    except Exception as e:
-        logging.critical(f"[!] Could not load stylesheet {args.stylesheet} (check YAML syntax)")
-        sys.exit(1)
-
-    # Extract the colors definition and keyword-to-color mappings from the config
-    headers = config_data["headers"]
-    keywords = config_data["keywords"]
-
     # If we don't specify an output file we will overwrite the input file
     if not args.outfile:
         args.outfile = args.infile
 
-    # Open workbook
-    try:
-        wb = load_workbook(args.infile)
-    except Exception as e:
-        logging.critical(f"[!] Could not open {args.infile}")
-        logging.critical(f"[!] {str(e)}")
-        sys.exit(1)
-
     # Colorize the entire workbook according to the color mappings and saving
     logging.debug(f"[+] Starting colorizing process for {args.infile}...")
-    colorize_workbook(wb, keywords, headers)
-    try:
-        wb.save(args.outfile)
-        logging.debug(f"[+] Done writing to {args.outfile}")
-    except Exception as e:
-        logging.critical(f"[!] Could not write to {args.outfile}")
+    colorize_workbook(args.infile, args.stylesheet, args.outfile)
+
 
 if __name__ == "__main__":
     try:
@@ -178,5 +191,6 @@ if __name__ == "__main__":
         print()
         sys.exit(1)
     except Exception as e:
-        logging.critical(f"[!] An error occured (str(e)")
+        logging.critical(f"[!] An error occured: {str(e)}")
+        raise e
         
