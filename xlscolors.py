@@ -52,7 +52,7 @@ def load_stylesheet(filename=DEFAULT_STYLESHEET):
         sys.exit(1)
 
     # Extract the colors definition and keyword-to-color mappings from the config
-    headers = config_data.get("headers", {})
+    headers = config_data.get("headers")
     keywords = config_data["keywords"]
 
     return headers, keywords
@@ -60,6 +60,7 @@ def load_stylesheet(filename=DEFAULT_STYLESHEET):
 def colorize_row_or_cell(ws, cell, fgcolor, bgcolor, bold=False, whole_row=False):
     '''
     Colorize a cell or a whole row depending on the value of whole_row
+    If multiple keywords match, the last one of the list will take precedence
     '''
     if whole_row:
         colorize_row(ws, cell, fgcolor, bgcolor, bold=False)
@@ -112,30 +113,22 @@ def colorize_worksheet(ws, headers, keywords):
                 if not cell.value:
                     continue
                 for keyword, kw_colors in keywords.items():
-                    # If the keyword starts/ends with '++' we match anything containing it
-                    if keyword.startswith("++") and keyword.endswith("++"):
-                        if keyword.strip("++").lower() in str(cell.value).lower():
-                            # If whole_row == True -> colorize the entire row if one of the keywords matches
-                            # If multiple keywords match, the last one of the list will take precedence
-                            colorize_row_or_cell(
-                                ws,
-                                cell,
-                                kw_colors["fg"], 
-                                kw_colors["bg"], 
-                                bold=kw_colors.get("bold"),
-                                whole_row=kw_colors.get("whole_row")
-                                )
-                    else:
-                        # ...else we match the keyword exactly
-                        if keyword.lower() == str(cell.value).lower():
-                            colorize_row_or_cell(
-                                ws,
-                                cell,
-                                kw_colors["fg"], 
-                                kw_colors["bg"], 
-                                bold=kw_colors.get("bold"),
-                                whole_row=kw_colors.get("whole_row")
-                                )
+                    # If the keyword starts and ends with '++' -> match anything containing it
+                    # Else match the exact value of the cell
+                    if ( 
+                        (keyword.startswith("++") and keyword.endswith("++")) \
+                        and keyword.strip("++").lower() in str(cell.value).lower() 
+                        ) \
+                        or keyword.lower() == str(cell.value).lower():
+                        # If whole_row == True -> colorize the entire row if one of the keywords matches
+                        colorize_row_or_cell(
+                            ws,
+                            cell,
+                            kw_colors["fg"], 
+                            kw_colors["bg"], 
+                            bold=kw_colors.get("bold"),
+                            whole_row=kw_colors.get("whole_row")
+                            )
 
 def colorize_workbook(filename, stylesheet="", outfile=""):
     '''
