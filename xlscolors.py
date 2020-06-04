@@ -52,16 +52,45 @@ def load_stylesheet(filename=DEFAULT_STYLESHEET):
         sys.exit(1)
 
     # Extract the colors definition and keyword-to-color mappings from the config
-    headers = config_data["headers"]
+    headers = config_data.get("headers", {})
     keywords = config_data["keywords"]
 
     return headers, keywords
+
+def colorize_row_or_cell(ws, cell, fgcolor, bgcolor, bold=False, whole_row=False):
+    '''
+    Colorize a cell or a whole row depending on the value of whole_row
+    '''
+    if whole_row:
+        colorize_row(ws, cell, fgcolor, bgcolor, bold=False)
+    else:
+        colorize_cell(cell, fgcolor, bgcolor, bold=False)
+
+def colorize_cell(cell, fgcolor, bgcolor, bold=False):
+    '''
+    Colorize a single row
+    '''
+    cell.font = Font(
+        color = fgcolor,
+        bold = bold
+        )
+    cell.fill = PatternFill(
+        start_color = bgcolor, 
+        end_color = bgcolor, 
+        fill_type = "solid"
+        )                    
+
+def colorize_row(ws, cell, fgcolor, bgcolor, bold):
+    '''
+    Colorize a whole row based on the index of a cell
+    '''
+    for cell in ws[cell.row]:
+        colorize_cell(cell, fgcolor, bgcolor, bold)
 
 def colorize_worksheet(ws, headers, keywords):
     '''
     Colorize an Excel worksheet 
     '''
-    
     logging.debug(f"[+] Colorizing worksheet {ws}")
     rownum = 0
     for row in ws.iter_rows():
@@ -69,16 +98,13 @@ def colorize_worksheet(ws, headers, keywords):
         if rownum == 1:
             # Colorize column headers if specified
             if headers:
-                for cell in row:
-                    cell.font = Font(
-                        color = headers["fg"],
-                        bold = headers["bold"]
-                        )
-                    cell.fill = PatternFill(
-                        start_color = headers["bg"], 
-                        end_color = headers["bg"], 
-                        fill_type = "solid"
-                        )
+                colorize_row(
+                    ws,
+                    cell,
+                    headers["fg"], 
+                    headers["bg"],
+                    bold=headers.get("bold")  
+                    )
         else:
             # Colorize the rest
             for cell in row:
@@ -86,23 +112,29 @@ def colorize_worksheet(ws, headers, keywords):
                 if not cell.value:
                     continue
                 for keyword, kw_colors in keywords.items():
-                    # If the keyword starts/ends with '++' we match anything...
+                    # If the keyword starts/ends with '++' we match anything containing it
                     if keyword.startswith("++") and keyword.endswith("++"):
                         if keyword.strip("++").lower() in str(cell.value).lower():
-                            cell.font = Font(color = kw_colors["fg"])
-                            cell.fill = PatternFill(
-                                start_color = kw_colors["bg"], 
-                                end_color = kw_colors["bg"], 
-                                fill_type = "solid"
-                                )                    
+                            # If whole_row == True -> colorize the entire row if one of the keywords matches
+                            # If multiple keywords match, the last one of the list will take precedence
+                            colorize_row_or_cell(
+                                ws,
+                                cell,
+                                kw_colors["fg"], 
+                                kw_colors["bg"], 
+                                bold=kw_colors.get("bold"),
+                                whole_row=kw_colors.get("whole_row")
+                                )
                     else:
                         # ...else we match the keyword exactly
                         if keyword.lower() == str(cell.value).lower():
-                            cell.font = Font(color = kw_colors["fg"])
-                            cell.fill = PatternFill(
-                                start_color = kw_colors["bg"], 
-                                end_color = kw_colors["bg"], 
-                                fill_type = "solid"
+                            colorize_row_or_cell(
+                                ws,
+                                cell,
+                                kw_colors["fg"], 
+                                kw_colors["bg"], 
+                                bold=kw_colors.get("bold"),
+                                whole_row=kw_colors.get("whole_row")
                                 )
 
 def colorize_workbook(filename, stylesheet="", outfile=""):
@@ -180,7 +212,7 @@ def main():
     if not args.outfile:
         args.outfile = args.infile
 
-    # Colorize the entire workbook according to the color mappings and saving
+    # Colorize the entire workbook according to the stylesheet
     logging.debug(f"[+] Starting colorizing process for {args.infile}...")
     colorize_workbook(args.infile, args.stylesheet, args.outfile)
 
@@ -193,5 +225,5 @@ if __name__ == "__main__":
         sys.exit(1)
     except Exception as e:
         logging.critical(f"[!] An error occured: {str(e)}")
-        raise e
-        
+        #raise e
+        sys.exit(1)
