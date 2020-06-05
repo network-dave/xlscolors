@@ -101,7 +101,7 @@ def colorize_worksheet(ws, headers, keywords):
             if headers:
                 colorize_row(
                     ws,
-                    cell,
+                    ws["A1"],
                     headers["fg"], 
                     headers["bg"],
                     bold=headers.get("bold")  
@@ -218,5 +218,5 @@ if __name__ == "__main__":
         sys.exit(1)
     except Exception as e:
         logging.critical(f"[!] An error occured: {str(e)}")
-        #raise e
+        raise e
         sys.exit(1)
