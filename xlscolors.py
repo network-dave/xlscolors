@@ -32,7 +32,7 @@ from openpyxl.styles import Font, PatternFill
 
 
 # Global options
-DEFAULT_STYLESHEET = "xlscolors.yaml"
+DEFAULT_STYLESHEET = "./xlscolors.yaml"
 
 
 def load_stylesheet(filename=DEFAULT_STYLESHEET):
@@ -40,7 +40,10 @@ def load_stylesheet(filename=DEFAULT_STYLESHEET):
     Load stylesheet from YAML file and return headers and keywords dicts
     '''
     if not os.path.exists(filename):
+        # Look for the default stylesheet in the working directory, else in the script's directory
         filename = DEFAULT_STYLESHEET
+        if not os.path.exists(filename):
+            filename = os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), "xlscolors.yaml")
 
     # Open YAML configuration file and transform it into a dictionnary
     logging.debug(f"[+] Loading stylesheet from {filename}")
@@ -48,7 +51,7 @@ def load_stylesheet(filename=DEFAULT_STYLESHEET):
         with open(filename) as f:
             config_data = yaml.load(f.read(), Loader=yaml.SafeLoader)
     except Exception as e:
-        logging.critical(f"[!] Could not load stylesheet {filename} (check YAML syntax)")
+        logging.critical(f"[!] Could not load stylesheet {filename} (check filename and YAML syntax)")
         sys.exit(1)
 
     # Extract the colors definition and keyword-to-color mappings from the config
@@ -139,6 +142,7 @@ def colorize_workbook(filename, stylesheet="", outfile=""):
         wb = load_workbook(filename)
     except:
         logging.critical(f"[!] Could not open {filename}")
+        sys.exit(1)
 
     # Check if we a YAML stylesheet with the same name than the Excel file exists, else load the default stylesheet
     if not stylesheet:
@@ -148,7 +152,6 @@ def colorize_workbook(filename, stylesheet="", outfile=""):
         stylesheet = DEFAULT_STYLESHEET
 
     # Load stylesheet from YAML file
-    logging.debug(f"[+] Loading stylesheet {stylesheet}")
     headers, keywords = load_stylesheet(stylesheet)
 
     for ws in wb.worksheets:
@@ -173,12 +176,14 @@ def main():
         description="Colorize Excel workbooks according to a stylesheet"
         )
     argparser.add_argument(
+        "-i",
         "--infile",
         required=True,
         metavar="filename.xlsx",
         help="Excel file to colorize"
         )
     argparser.add_argument(
+        "-o",
         "--outfile",
         metavar="filename.xlsx",
         help="save colorized output to file (default=overwrite input file)"

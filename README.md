@@ -19,7 +19,7 @@ For available options, see :
 python xlscolors.py --help
 ```
 
-**ATTENTION:** if no ```--outfile``` is specified, the Excel workbook will be modified in place! Please backup your important files first.
+**ATTENTION:** if no ```--outfile``` is specified, the Excel workbook will be modified in place! Please backup your important files just in case.
 
 
 
@@ -28,8 +28,8 @@ xlscolors.py colors spreadsheets according to a stylesheet written in YAML :
 
 - xlscolors will look for a .yaml file with the same name as the Excel file (e.g. file1.yaml for file1.xlsx)
 - alternatively, a specific stylesheet can be specified at the command line with the --stylesheet argument
-- if no file is found then it will use xlscolors.yaml
-- if none of these files are found xlscolors will stop.
+- if no file is found then it will look for xlscolors.yaml in the currect working directory, then in xlscolors.py's directory
+- if none of these files are found then xlscolors will exit.
 
 
 
