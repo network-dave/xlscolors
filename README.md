@@ -3,17 +3,18 @@
 Colorize Excel spreadsheets according to keywords defined in a stylesheet, using the OpenPyxl library.
 
 
-## Installing/Getting started
+## Requirements / Getting started
 
 ```shell
-pip3 install -r requirements.txt
-python xlscolors.py --infile my_excel_file.xlsx [--outfile colorized.xlsx]
+$ pip3 install -r requirements.txt
+$ python xlscolors.py --infile my_excel_file.xlsx [--outfile colorized.xlsx]
 ```
 
 Works with .xls and .xlsx files.
 
 
 ## Usage:
+
 For available options, see :
 ```shell
 python xlscolors.py --help
@@ -84,8 +85,13 @@ keywords:
 See the xlscolors.yaml file for more examples.
 
 
-## Licensing
+## License
 
-Author: David Paneels
+Copyright (C) 2020 David Paneels
 
-This project is private and for internal use only. 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+https://www.gnu.org/licenses/gpl-3.0.html
